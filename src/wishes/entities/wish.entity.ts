@@ -39,9 +39,9 @@ export class Wish {
   @IsNumber()
   price: number;
 
-  @Column({ type: 'decimal', scale: 2 })
+  @Column({ type: 'decimal', scale: 2, default: 0 })
   @IsNumber()
-  raised: string;
+  raised: number;
 
   @ManyToOne(() => User, (owner) => owner.wishes)
   owner: User;

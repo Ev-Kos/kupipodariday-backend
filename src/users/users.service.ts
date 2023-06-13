@@ -28,7 +28,7 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findMany(user): Promise<User[]> {
+  async findMany(user: { query: any }): Promise<User[]> {
     return await this.usersRepository.find({
       where: [{ username: user.query }, { email: user.query }],
     });

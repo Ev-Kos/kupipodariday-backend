@@ -14,16 +14,16 @@ import { WishesService } from 'src/wishes/wishes.service';
 export class OffersService {
   constructor(
     @InjectRepository(Offer)
-    private offerRepository: Repository<Offer>,
+    private offersRepository: Repository<Offer>,
     private wishesService: WishesService,
   ) {}
 
   async findAll(): Promise<Offer[]> {
-    return this.offerRepository.find({ relations: ['item', 'user'] });
+    return this.offersRepository.find({ relations: ['item', 'user'] });
   }
 
   findOne(id: number): Promise<Offer> {
-    return this.offerRepository.findOne({
+    return this.offersRepository.findOne({
       relations: {
         item: true,
         user: true,
@@ -32,20 +32,20 @@ export class OffersService {
     });
   }
 
-  async create(user: User, offer: CreateOfferDto) {
-    const wishes = await this.wishesService.findOne(offer.itemId);
+  async create(user: User, createOfferDto: CreateOfferDto) {
+    const wishes = await this.wishesService.findOne(createOfferDto.itemId);
     const { id } = user;
     const moneyDifference = wishes.price - wishes.raised;
     const wish = await this.wishesService.findOne(wishes.id);
 
-    if (offer.amount > moneyDifference) {
+    if (createOfferDto.amount > moneyDifference) {
       throw new BadRequestException(
         'Сумма взноса превышает сумму остатка стоимости подарка',
       );
     }
 
-    await this.wishesService.update(offer.itemId, {
-      raised: wishes.raised + offer.amount,
+    await this.wishesService.updateRaised(createOfferDto.itemId, {
+      raised: wishes.raised + createOfferDto.amount,
     });
 
     if (id === wishes.owner.id) {
@@ -59,8 +59,8 @@ export class OffersService {
         'Обновление запрещено, поскольку идёт сбор средств',
       );
     }
-    return this.offerRepository.save({
-      ...offer,
+    return this.offersRepository.save({
+      ...createOfferDto,
       user,
       item: wish,
     });
