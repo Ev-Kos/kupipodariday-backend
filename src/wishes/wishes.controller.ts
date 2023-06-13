@@ -18,7 +18,7 @@ import { UpdateWishDto } from './dto/UpdateWishDto';
 @UseGuards(JwtGuard)
 @Controller('wishes')
 export class WishesController {
-  constructor(private readonly wishesService: WishesService) {}
+  constructor(private wishesService: WishesService) {}
 
   @Get('top')
   getTopWishes() {

@@ -15,13 +15,13 @@ export class WishlistsService {
     private wishesService: WishesService,
   ) {}
 
-  async create(createWishListDto: CreateWishlistDto, ownerId: number) {
-    const { itemsId, ...rest } = createWishListDto;
-    const items = itemsId.map((id) => ({ id }));
+  async create(createWishListDto: CreateWishlistDto, user: User) {
+    const items = await this.wishesService.findMany(createWishListDto.itemsId);
+
     const wishList = this.wishListsRepository.create({
-      ...rest,
+      ...createWishListDto,
       items,
-      owner: { id: ownerId },
+      owner: user,
     });
 
     return await this.wishListsRepository.save(wishList);
@@ -36,7 +36,7 @@ export class WishlistsService {
     });
   }
 
-  async findWishlistById(id: number) {
+  async findOne(id: number) {
     const wishlist = await this.wishListsRepository.findOne({
       where: { id },
       relations: { items: true, owner: true },
@@ -51,7 +51,7 @@ export class WishlistsService {
     updateWishlistDto: UpdateWishlistDto,
     wishlistId: number,
   ) {
-    const wishlist = await this.findWishlistById(wishlistId);
+    const wishlist = await this.findOne(wishlistId);
     if (user.id !== wishlist.owner.id) {
       throw new ForbiddenException(
         'Вы не можете изменить список желаний другого пользователя',
@@ -67,8 +67,8 @@ export class WishlistsService {
     });
   }
 
-  async removeWishlist(wishlistId: number, userId: number) {
-    const wishlist = await this.findWishlistById(wishlistId);
+  async remove(wishlistId: number, userId: number) {
+    const wishlist = await this.findOne(wishlistId);
     if (userId !== wishlist.owner.id) {
       throw new ForbiddenException(
         'Вы не можете удалить список желаний другого пользователя',
