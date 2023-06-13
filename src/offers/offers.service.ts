@@ -37,6 +37,7 @@ export class OffersService {
     const { id } = user;
     const moneyDifference = wishes.price - wishes.raised;
     const wish = await this.wishesService.findOne(wishes.id);
+    const newRised = wish.raised + createOfferDto.amount;
 
     if (createOfferDto.amount > moneyDifference) {
       throw new BadRequestException(
@@ -44,9 +45,7 @@ export class OffersService {
       );
     }
 
-    await this.wishesService.updateRaised(createOfferDto.itemId, {
-      raised: wishes.raised + createOfferDto.amount,
-    });
+    await this.wishesService.updateByRised(wish.id, newRised);
 
     if (id === wishes.owner.id) {
       throw new BadRequestException(
