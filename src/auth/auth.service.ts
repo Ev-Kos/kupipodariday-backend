@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { HashService } from './hash/hash.service';
@@ -13,12 +14,12 @@ export class AuthService {
   ) {}
 
   auth(user: User) {
-    const payload = { id: user.id };
-    return { access_token: this.jwtService.sign(payload) };
+    const payload = { sub: user.id };
+    return { auth_token: this.jwtService.sign(payload) };
   }
 
-  async validatePassword(username: string, password: string) {
-    const user = await this.usersService.findByUsername(username);
+  async validateUser(username: string, password: string) {
+    const user = await this.usersService.findUsername(username);
     if (user) {
       if (await this.hashService.isPasswordValid(password, user.password)) {
         const { password, ...result } = user;

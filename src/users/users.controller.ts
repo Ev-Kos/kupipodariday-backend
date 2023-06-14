@@ -36,7 +36,7 @@ export class UsersController {
 
   @Get(':username')
   async getUserByName(@Param('username') username: string) {
-    const user = await this.usersService.findByUsername(username);
+    const user = await this.usersService.findUsername(username);
     if (!user) {
       throw new NotFoundException('Пользователь не найден');
     }
@@ -51,7 +51,7 @@ export class UsersController {
 
   @Get(':username/wishes')
   async findWishesByUserName(@Param('username') username: string) {
-    const user = await this.usersService.findByUsername(username);
+    const user = await this.usersService.findUsername(username);
     const wish = await this.wishesService.findWishesByUserId(user.id);
     return wish;
   }
