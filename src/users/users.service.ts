@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { HashService } from 'src/auth/hash/hash.service';
+import { PasswordHashService } from 'src/auth/password-hash/password-hash.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/CreateUserDto';
 import { UpdateUserDto } from './dto/UpdateUserDto';
@@ -11,22 +11,24 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private hashService: HashService,
+    private passwordHashService: PasswordHashService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    if ((await this.findUsername(createUserDto.username)) !== null) {
+    const username = await this.findUsername(createUserDto.username);
+    const email = await this.findEmail(createUserDto.email);
+    if (username !== null) {
       throw new ForbiddenException(
         'Пользователь с таким логином уже зарегистрирован',
       );
     }
-    if ((await this.findEmail(createUserDto.email)) !== null) {
+    if (email) {
       throw new ForbiddenException(
         'Пользователь с такой почтой уже зарегистрирован',
       );
     }
     const user = this.usersRepository.create(createUserDto);
-    user.password = await this.hashService.createHash(user.password);
+    user.password = await this.passwordHashService.createHash(user.password);
     return await this.usersRepository.save(user);
   }
 
@@ -46,21 +48,21 @@ export class UsersService {
 
   async updateOne(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
-      updateUserDto.password = await this.hashService.createHash(
+      updateUserDto.password = await this.passwordHashService.createHash(
         updateUserDto.password,
       );
     }
     if (updateUserDto.username) {
-      const checkName = await this.findUsername(updateUserDto.username);
-      if (checkName !== null && checkName.id !== id) {
+      const username = await this.findUsername(updateUserDto.username);
+      if (username !== null && username.id !== id) {
         throw new ForbiddenException(
           'Пользователь с таким логином уже зарегистрирован',
         );
       }
     }
     if (updateUserDto.email) {
-      const checkEmail = await this.findEmail(updateUserDto.email);
-      if (checkEmail !== null && checkEmail.id !== id) {
+      const email = await this.findEmail(updateUserDto.email);
+      if (email !== null && email.id !== id) {
         throw new ForbiddenException(
           'Пользователь с такой почтой уже зарегистрирован',
         );

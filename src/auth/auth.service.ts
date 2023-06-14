@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { HashService } from './hash/hash.service';
+import { PasswordHashService } from './password-hash/password-hash.service';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 
@@ -10,7 +10,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-    private hashService: HashService,
+    private passwordHashService: PasswordHashService,
   ) {}
 
   auth(user: User) {
@@ -20,8 +20,12 @@ export class AuthService {
 
   async validateUser(username: string, password: string) {
     const user = await this.usersService.findUsername(username);
+    const validPassword = await this.passwordHashService.validPassword(
+      password,
+      user.password,
+    );
     if (user) {
-      if (await this.hashService.validPassword(password, user.password)) {
+      if (validPassword) {
         const { password, ...result } = user;
         return result;
       } else {
