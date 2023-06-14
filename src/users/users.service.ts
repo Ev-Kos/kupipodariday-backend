@@ -26,7 +26,7 @@ export class UsersService {
       );
     }
     const user = this.usersRepository.create(createUserDto);
-    user.password = await this.hashService.generateHash(user.password);
+    user.password = await this.hashService.createHash(user.password);
     return await this.usersRepository.save(user);
   }
 
@@ -46,7 +46,7 @@ export class UsersService {
 
   async updateOne(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
-      updateUserDto.password = await this.hashService.generateHash(
+      updateUserDto.password = await this.hashService.createHash(
         updateUserDto.password,
       );
     }
