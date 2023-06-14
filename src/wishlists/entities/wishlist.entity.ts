@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinTable,
 } from 'typeorm';
-import { IsDate, Length, IsUrl } from 'class-validator';
+import { IsDate, Length, IsUrl, IsOptional } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Wish } from 'src/wishes/entities/wish.entity';
 
@@ -30,15 +30,12 @@ export class Wishlist {
   name: string;
 
   @Column()
-  @Length(1, 1500)
-  description: string;
-
-  @Column()
   @IsUrl()
   image: string;
 
   @ManyToMany(() => Wish, (wish) => wish.name)
   @JoinTable()
+  @IsOptional()
   items: Wish[];
 
   @ManyToOne(() => User, (user) => user.wishlists)
