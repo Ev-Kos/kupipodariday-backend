@@ -21,7 +21,7 @@ export class WishesService {
     return this.wishesRepository.find();
   }
 
-  async create(owner: User, createWishDto: CreateWishDto) {
+  async create(owner: User, createWishDto: CreateWishDto): Promise<Wish> {
     return await this.wishesRepository.save({
       ...createWishDto,
       owner: owner,
@@ -67,7 +67,7 @@ export class WishesService {
     });
   }
 
-  findWishesByUserId(userId: number) {
+  findWishesByUserId(userId: number): Promise<Wish[]> {
     return this.wishesRepository.find({
       where: { owner: { id: userId } },
       relations: {

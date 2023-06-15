@@ -1,30 +1,11 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Column,
-  ManyToMany,
-  ManyToOne,
-  JoinTable,
-} from 'typeorm';
-import { IsDate, Length, IsUrl, IsOptional } from 'class-validator';
+import { Entity, Column, ManyToMany, ManyToOne, JoinTable } from 'typeorm';
+import { Length, IsUrl, IsOptional } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Wish } from 'src/wishes/entities/wish.entity';
+import { BaseEntity } from 'src/utils/base-entity';
 
 @Entity({ schema: 'kupipodariday' })
-export class Wishlist {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @CreateDateColumn()
-  @IsDate()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  @IsDate()
-  updatedAt: Date;
-
+export class Wishlist extends BaseEntity {
   @Column()
   @Length(1, 250)
   name: string;

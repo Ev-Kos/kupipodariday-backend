@@ -15,7 +15,10 @@ export class WishlistsService {
     private wishesService: WishesService,
   ) {}
 
-  async create(createWishListDto: CreateWishlistDto, user: User) {
+  async create(
+    createWishListDto: CreateWishlistDto,
+    user: User,
+  ): Promise<Wishlist> {
     const items = await this.wishesService.findMany(createWishListDto.itemsId);
 
     const wishList = this.wishListsRepository.create({
@@ -27,7 +30,7 @@ export class WishlistsService {
     return await this.wishListsRepository.save(wishList);
   }
 
-  async findMany() {
+  async findMany(): Promise<Wishlist[]> {
     return await this.wishListsRepository.find({
       relations: {
         items: true,
@@ -36,7 +39,7 @@ export class WishlistsService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Wishlist> {
     const wishlist = await this.wishListsRepository.findOne({
       where: { id },
       relations: { items: true, owner: true },
@@ -50,7 +53,7 @@ export class WishlistsService {
     user: User,
     updateWishlistDto: UpdateWishlistDto,
     wishlistId: number,
-  ) {
+  ): Promise<Wishlist> {
     const wishlist = await this.findOne(wishlistId);
     if (user.id !== wishlist.owner.id) {
       throw new ForbiddenException(

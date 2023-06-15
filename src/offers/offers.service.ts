@@ -19,7 +19,12 @@ export class OffersService {
   ) {}
 
   async findAll(): Promise<Offer[]> {
-    return this.offersRepository.find({ relations: ['item', 'user'] });
+    return this.offersRepository.find({
+      relations: {
+        item: true,
+        user: true,
+      },
+    });
   }
 
   findOne(id: number): Promise<Offer> {
@@ -32,7 +37,7 @@ export class OffersService {
     });
   }
 
-  async create(user: User, createOfferDto: CreateOfferDto) {
+  async create(user: User, createOfferDto: CreateOfferDto): Promise<Offer> {
     const wishes = await this.wishesService.findOne(createOfferDto.itemId);
     const { id } = user;
     const moneyDifference = wishes.price - wishes.raised;

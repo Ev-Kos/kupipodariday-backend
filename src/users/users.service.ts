@@ -46,7 +46,7 @@ export class UsersService {
     });
   }
 
-  async updateOne(id: number, updateUserDto: UpdateUserDto) {
+  async updateOne(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     if (updateUserDto.password) {
       updateUserDto.password = await this.passwordHashService.createHash(
         updateUserDto.password,
@@ -74,7 +74,7 @@ export class UsersService {
     return updatedUser;
   }
 
-  async findUsername(username: string) {
+  async findUsername(username: string): Promise<User> {
     return await this.usersRepository.findOne({
       where: {
         username: username,
@@ -82,7 +82,7 @@ export class UsersService {
     });
   }
 
-  async findEmail(email: string) {
+  async findEmail(email: string): Promise<User> {
     return await this.usersRepository.findOne({
       where: {
         email: email,

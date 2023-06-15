@@ -15,7 +15,7 @@ export class AuthService {
 
   auth(user: User) {
     const payload = { sub: user.id };
-    return { auth_token: this.jwtService.sign(payload) };
+    return { access_token: this.jwtService.sign(payload) };
   }
 
   async validateUser(username: string, password: string) {
